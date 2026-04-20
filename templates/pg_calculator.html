@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PG Calculator</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 960px; }
+    h1 { margin-bottom: .2rem; }
+    .hint { color: #555; margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    label { font-size: .9rem; color: #333; display: block; }
+    input { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 1rem; padding: 10px 14px; }
+    pre { background: #111; color: #f5f5f5; padding: 12px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Parameter Golf Calculator</h1>
+  <div class="hint">Route: <code>/pg-calculator</code>. Minimal-input version.</div>
+
+  <form id="calc-form" onsubmit="return false;">
+    <div class="grid">
+      <div><label>V<input id="V" type="number" value="{{ defaults.V }}" /></label></div>
+      <div><label>d<input id="d" type="number" value="{{ defaults.d }}" /></label></div>
+      <div><label>L<input id="L" type="number" value="{{ defaults.L }}" /></label></div>
+      <div><label>m<input id="m" type="number" step="any" value="{{ defaults.m }}" /></label></div>
+      <div><label>H<input id="H" type="number" value="{{ defaults.H }}" /></label></div>
+      <div><label>K<input id="K" type="number" value="{{ defaults.K }}" /></label></div>
+
+      <div><label>tokens_per_byte<input id="tokens_per_byte" type="number" step="any" value="{{ defaults.tokens_per_byte }}" /></label></div>
+      <div><label>val_loss_estimate<input id="val_loss_estimate" type="number" step="any" value="{{ defaults.val_loss_estimate }}" /></label></div>
+      <div><label>weight_bits<input id="weight_bits" type="number" step="any" value="{{ defaults.weight_bits }}" /></label></div>
+
+      <div><label>compression_ratio<input id="compression_ratio" type="number" step="any" value="{{ defaults.compression_ratio }}" /></label></div>
+      <div><label>train_seconds<input id="train_seconds" type="number" step="any" value="{{ defaults.train_seconds }}" /></label></div>
+      <div><label>eval_seconds<input id="eval_seconds" type="number" step="any" value="{{ defaults.eval_seconds }}" /></label></div>
+    </div>
+    <button id="run-btn">Compute</button>
+  </form>
+
+  <h3>Result</h3>
+  <pre id="out">Click Compute.</pre>
+
+  <script>
+    async function run() {
+      const ids = [
+        "V", "d", "L", "m", "H", "K",
+        "tokens_per_byte", "val_loss_estimate", "weight_bits", "compression_ratio", "train_seconds", "eval_seconds"
+      ];
+      const payload = {};
+      for (const id of ids) payload[id] = document.getElementById(id).value;
+
+      const res = await fetch('/api/pg-calculator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+    }
+    document.getElementById('run-btn').addEventListener('click', run);
+  </script>
+</body>
+</html>
