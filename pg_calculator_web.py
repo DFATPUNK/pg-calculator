@@ -7,20 +7,17 @@ from pg_calculator_core import CalculatorError, CalculatorInputs, calculate, res
 
 app = Flask(__name__)
 
-
 def _coerce_float(name: str, data: dict) -> float:
     try:
         return float(data[name])
     except Exception as e:
         raise CalculatorError(f"Invalid value for {name}") from e
 
-
 def _coerce_int(name: str, data: dict) -> int:
     try:
         return int(data[name])
     except Exception as e:
         raise CalculatorError(f"Invalid value for {name}") from e
-
 
 def _parse_inputs(data: dict) -> CalculatorInputs:
     return CalculatorInputs(
@@ -38,11 +35,9 @@ def _parse_inputs(data: dict) -> CalculatorInputs:
         eval_seconds=_coerce_float("eval_seconds", data),
     )
 
-
 @app.get("/")
 def root():
     return redirect("/pg-calculator", code=302)
-
 
 @app.get("/pg-calculator")
 def pg_calculator_page():
@@ -62,7 +57,6 @@ def pg_calculator_page():
     }
     return render_template("pg_calculator.html", defaults=defaults)
 
-
 @app.post("/api/pg-calculator")
 def pg_calculator_api():
     payload = request.get_json(force=True, silent=True) or {}
@@ -71,7 +65,6 @@ def pg_calculator_api():
         return jsonify({"ok": True, "result": result_to_dict(result)})
     except CalculatorError as e:
         return jsonify({"ok": False, "error": str(e)}), 400
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=False)

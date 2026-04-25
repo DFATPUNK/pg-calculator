@@ -16,7 +16,6 @@ CTRL_MUL = 4.0
 INCLUDE_SKIP = True
 EXTRA_MUL = 1.0
 
-
 @dataclass
 class CalculatorInputs:
     V: int
@@ -31,7 +30,6 @@ class CalculatorInputs:
     compression_ratio: float
     train_seconds: float
     eval_seconds: float
-
 
 @dataclass
 class CalculatorResult:
@@ -59,10 +57,8 @@ class CalculatorResult:
     eval_runtime_ok: bool
     eligible: bool
 
-
 class CalculatorError(ValueError):
     pass
-
 
 def _compute_params(V: int, d: int, L: int, m: float, H: int, K: int) -> tuple[int, dict[str, int]]:
     if H <= 0 or K <= 0:
@@ -89,7 +85,6 @@ def _compute_params(V: int, d: int, L: int, m: float, H: int, K: int) -> tuple[i
         "N_extra": n_extra,
     }
 
-
 def _estimate_artifact_bytes(N_params: int, weight_bits: float, compression_ratio: float) -> tuple[int, int]:
     if compression_ratio <= 0:
         raise CalculatorError("compression_ratio must be > 0")
@@ -100,7 +95,6 @@ def _estimate_artifact_bytes(N_params: int, weight_bits: float, compression_rati
     compressed_model = int(round(with_overhead / compression_ratio))
     total_artifact = compressed_model + CODE_BYTES_ASSUMPTION
     return compressed_model, total_artifact
-
 
 def calculate(inputs: CalculatorInputs) -> CalculatorResult:
     N_params, parts = _compute_params(inputs.V, inputs.d, inputs.L, inputs.m, inputs.H, inputs.K)
@@ -140,7 +134,6 @@ def calculate(inputs: CalculatorInputs) -> CalculatorResult:
         eval_runtime_ok=eval_ok,
         eligible=artifact_ok and train_ok and eval_ok,
     )
-
 
 def result_to_dict(result: CalculatorResult) -> dict:
     return asdict(result)
